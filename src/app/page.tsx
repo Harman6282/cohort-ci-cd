@@ -40,7 +40,8 @@ function Home() {
       animate="show"
     >
       <motion.h1 className="text-7xl font-bold text-[#452b1f]" variants={item}>
-        Happy Birthday Dad!
+        Dad Thank you for everything! ❤️
+        <br />
       </motion.h1>
       <motion.p className="text-4xl text-[#452b1f] mt-4" variants={item}>
         Wishing you a day as bright and beautiful as you are!
