@@ -1,24 +1,36 @@
-name: Deploy to EC2
+name: Push-to-EC2
 
 on:
   push:
     branches:
-      - main
+      - main  # Triggers on push to main branch
 
 jobs:
   deploy:
-    name: Push to EC2
+    name: Deploy to EC2 on main branch push
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout the code
+      - name: Checkout the files
         uses: actions/checkout@v2
 
-      - name: executing remote ssh commands using password
-        uses: appleboy/ssh-action@v1.2.0
+      - name: Deploy to Server
+        uses: easingthemes/ssh-deploy@main
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.EC2_KEY }}
+          REMOTE_HOST: ${{ secrets.EC2_HOST }}
+          REMOTE_USER: ${{ secrets.EC2_USERNAME }}
+          TARGET: ${{ secrets.EC2_TARGETDIR }}
+
+      - name: Execute remote SSH commands
+        uses: appleboy/ssh-action@master
         with:
-          host: 13.127.14.79
-          username: ubuntu
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: 22
-          script: ./deploy.sh
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            cd /home/ubuntu/next-app
+            git pull origin master
+            npm install
+            npm run build
+            pm2 restart next-app || pm2 start npm --name "next-app" -- start
